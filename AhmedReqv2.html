@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <title>Hack4SaferPlates Screens</title>
 
 <!-- Manifest & PWA -->
 <link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="transparent">
+<meta name="theme-color" content="transparent"> <!-- Android: edge-to-edge -->
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" /> <!-- iOS: edge-to-edge -->
 <link rel="apple-touch-icon" href="screen_one.png" />
 
 <style>
@@ -74,6 +74,16 @@
     filter:saturate(1.1);
   }
 
+  /* Optional readability overlay for status bar area */
+  .statusbar-shade {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: env(safe-area-inset-top, 24px);
+    background: linear-gradient(to bottom, rgba(0,0,0,.25), rgba(0,0,0,0));
+    pointer-events: none;
+    z-index: 999;
+  }
+
   @media (max-width:1024px){
     .btn{width:35vw;max-width:250px;min-width:120px;bottom:12vh}
   }
@@ -84,6 +94,9 @@
 </style>
 </head>
 <body>
+
+<!-- subtle shade so status text stays visible over bright images -->
+<div class="statusbar-shade"></div>
 
 <div id="screen1" class="screen active">
   <div class="btn" id="startBtn">
