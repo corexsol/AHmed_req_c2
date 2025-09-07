@@ -99,13 +99,17 @@
   const screen2 = document.getElementById('screen2');
 
   startBtn.addEventListener('click', () => {
-    screen1.classList.remove('active');
-    screen2.classList.add('active');
+    startBtn.style.pointerEvents = 'none';
+    setTimeout(() => {
+      screen1.classList.remove('active');
+      screen2.classList.add('active');
+    }, 2000);
   });
 
   screen2.addEventListener('dblclick', () => {
     screen2.classList.remove('active');
     screen1.classList.add('active');
+    startBtn.style.pointerEvents = 'auto';
   });
 
   if ('serviceWorker' in navigator) {
