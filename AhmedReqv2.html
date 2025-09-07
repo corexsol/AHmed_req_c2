@@ -2,37 +2,27 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
 <title>Hack4SaferPlates Screens</title>
-
-<!-- Manifest & PWA -->
 <link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="transparent"> <!-- Android: edge-to-edge -->
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" /> <!-- iOS: edge-to-edge -->
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <link rel="apple-touch-icon" href="screen_one.png" />
-
 <style>
   :root{
-    --glow: 34,197,94;        /* #22c55e */
-    --fade-dur: 800ms;
-    --glow-dur: 350ms;
-    --pulse-dur: 1300ms;
+    --glow: 34,197,94;   /* #22c55e (R,G,B) */
+    --fade-dur: 800ms;   /* crossfade duration */
+    --press-dur: 350ms;  /* press ramp duration */
     --easing: cubic-bezier(.4,0,.2,1);
   }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{
-    height:100%;
-    font-family:Arial,Helvetica,sans-serif;
-    overflow:hidden;
-    background:#000; /* fallback behind images */
-  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;overflow:hidden}
 
+  /* Screens */
   .screen{
     position:fixed;inset:0;background:#fff;
     opacity:0;visibility:hidden;
     transition:opacity var(--fade-dur) var(--easing), visibility 0s linear var(--fade-dur);
-    will-change:opacity;
   }
   .screen.active{
     opacity:1;visibility:visible;
@@ -41,49 +31,41 @@
   body.crossfade{pointer-events:none}
   body.crossfade .screen{visibility:visible}
 
+  /* Backgrounds */
   #screen1{background:url('screen_1_NB.jpg') no-repeat center/cover}
   #screen2{background:url('screen_two.png') no-repeat center/cover;background-color:#fff}
 
+  /* Button with breathing glow at rest */
   .btn{
-    position:absolute;left:50%;bottom:15vh;
-    transform:translateX(-50%) scale(1);
-    width:25vw;max-width:200px;min-width:100px;
-    border-radius:999px;cursor:pointer;z-index:20;
-    animation:glowPulse var(--pulse-dur) ease-in-out infinite;
-    transition:transform var(--glow-dur) var(--easing), box-shadow var(--glow-dur) var(--easing), filter var(--glow-dur) var(--easing);
-    will-change:transform,box-shadow,filter;
-    -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+    position:absolute;left:50%;bottom:15vh;transform:translateX(-50%) scale(1);
+    width:25vw;max-width:200px;min-width:100px;border-radius:999px;cursor:pointer;z-index:20;
+    /* base halo (will be animated) */
+    box-shadow:0 0 18px 10px rgba(var(--glow), .35);
+    animation: glowRest 1.6s ease-in-out infinite;
+    transition: transform var(--press-dur) var(--easing), filter var(--press-dur) var(--easing);
+    will-change: box-shadow, transform, filter;
   }
-  .btn img{
-    width:100%;height:auto;display:block;border-radius:inherit;
-    -webkit-user-drag:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;
-    pointer-events:none;
+  .btn img{width:100%;height:auto;display:block;border-radius:inherit;pointer-events:none}
+
+  /* Resting: strength-only pulse (no movement) */
+  @keyframes glowRest{
+    0%   { box-shadow: 0 0 14px 8px  rgba(var(--glow), .28); }
+    50%  { box-shadow: 0 0 28px 18px rgba(var(--glow), .55); }
+    100% { box-shadow: 0 0 14px 8px  rgba(var(--glow), .28); }
   }
 
-  @keyframes glowPulse{
-    0%  {transform:translateX(-50%) scale(1);    box-shadow:0 0 0 0 rgba(var(--glow),.65)}
-    35% {transform:translateX(-50%) scale(1.06); box-shadow:0 0 22px 12px rgba(var(--glow),.45)}
-    65% {transform:translateX(-50%) scale(1.03); box-shadow:0 0 14px 8px  rgba(var(--glow),.28)}
-    100%{transform:translateX(-50%) scale(1);    box-shadow:0 0 0 0 rgba(var(--glow),0)}
-  }
-
+  /* Press state: stronger, bigger, quick ramp */
   .btn.transitioning{
-    animation:none;
     transform:translateX(-50%) scale(1.18);
-    box-shadow:0 0 80px 36px rgba(var(--glow),.95);
-    filter:saturate(1.1);
+    filter:saturate(1.08);
+    animation: glowBoost var(--press-dur) ease-out forwards;
+  }
+  @keyframes glowBoost{
+    0%   { box-shadow: 0 0 28px 18px rgba(var(--glow), .55); }
+    100% { box-shadow: 0 0 90px 44px rgba(var(--glow), .95); }
   }
 
-  /* Optional readability overlay for status bar area */
-  .statusbar-shade {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: env(safe-area-inset-top, 24px);
-    background: linear-gradient(to bottom, rgba(0,0,0,.25), rgba(0,0,0,0));
-    pointer-events: none;
-    z-index: 999;
-  }
-
+  /* Responsive */
   @media (max-width:1024px){
     .btn{width:35vw;max-width:250px;min-width:120px;bottom:12vh}
   }
@@ -94,9 +76,6 @@
 </style>
 </head>
 <body>
-
-<!-- subtle shade so status text stays visible over bright images -->
-<div class="statusbar-shade"></div>
 
 <div id="screen1" class="screen active">
   <div class="btn" id="startBtn">
@@ -112,10 +91,11 @@
   const screen2  = document.getElementById('screen2');
   const body     = document.body;
 
-  const debounceMs = 50;
-  const dblDelayMs = 100;
-  const fadeDurMs  = 800;
-  const glowDurMs  = 350;
+  // timings
+  const debounceMs = 50;   // 0.05s pre-press lock
+  const dblDelayMs = 100;  // 0.1s dbl-tap unlock
+  const fadeDurMs  = 800;  // matches --fade-dur
+  const pressDurMs = 350;  // matches --press-dur
 
   let allowDoubleTap = false;
   let startLocked    = false;
@@ -125,23 +105,28 @@
     startLocked = true;
 
     setTimeout(() => {
+      // ramp glow stronger and scale up
       startBtn.classList.add('transitioning');
       body.classList.add('crossfade');
 
-      screen2.classList.add('active');
-      screen1.classList.remove('active');
+      // crossfade screens
+      screen2.classList.add('active');    // fade in
+      screen1.classList.remove('active'); // fade out
 
+      // enable dblclick back shortly after
       allowDoubleTap = false;
       setTimeout(() => { allowDoubleTap = true; }, dblDelayMs);
 
+      // clean up after transition completes
       setTimeout(() => {
         body.classList.remove('crossfade');
         startBtn.classList.remove('transitioning');
         startLocked = false;
-      }, Math.max(fadeDurMs, glowDurMs) + 50);
+      }, Math.max(fadeDurMs, pressDurMs) + 50);
     }, debounceMs);
   });
 
+  // Return with double-tap from screen2
   screen2.addEventListener('dblclick', () => {
     if (!allowDoubleTap) return;
     body.classList.add('crossfade');
@@ -150,8 +135,7 @@
     setTimeout(() => { body.classList.remove('crossfade'); }, fadeDurMs + 50);
   });
 
-  startBtn.addEventListener("contextmenu", (e) => e.preventDefault());
-
+  // PWA SW
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('service-worker.js');
