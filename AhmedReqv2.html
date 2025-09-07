@@ -8,56 +8,73 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <link rel="apple-touch-icon" href="screen_one.png" />
+
 <style>
   :root{
-    --glow: 34,197,94;   /* #22c55e (R,G,B) */
-    --fade-dur: 800ms;   /* crossfade duration */
-    --press-dur: 350ms;  /* press ramp duration */
+    --glow: 34,197,94;   /* #22c55e */
+    --fade-dur: 800ms;   /* screen fade */
+    --press-dur: 350ms;  /* press glow ramp */
     --easing: cubic-bezier(.4,0,.2,1);
   }
-  *{box-sizing:border-box}
-  html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;overflow:hidden}
+
+  /* Disable selection/tap highlight globally */
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body, .screen, .btn {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  html, body {
+    margin: 0; height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
+  }
 
   /* Screens */
   .screen{
-    position:fixed;inset:0;background:#fff;
-    opacity:0;visibility:hidden;
-    transition:opacity var(--fade-dur) var(--easing), visibility 0s linear var(--fade-dur);
+    position: fixed; inset: 0; background: #fff;
+    opacity: 0; visibility: hidden;
+    transition: opacity var(--fade-dur) var(--easing), visibility 0s linear var(--fade-dur);
   }
   .screen.active{
-    opacity:1;visibility:visible;
-    transition:opacity var(--fade-dur) var(--easing);
+    opacity: 1; visibility: visible;
+    transition: opacity var(--fade-dur) var(--easing);
   }
-  body.crossfade{pointer-events:none}
-  body.crossfade .screen{visibility:visible}
+  body.crossfade{ pointer-events: none; }
+  body.crossfade .screen{ visibility: visible; }
 
   /* Backgrounds */
-  #screen1{background:url('screen_1_NB.jpg') no-repeat center/cover}
-  #screen2{background:url('screen_two.png') no-repeat center/cover;background-color:#fff}
+  #screen1{ background: url('screen_1_NB.jpg') no-repeat center/cover; }
+  #screen2{ background: url('screen_two.png') no-repeat center/cover; background-color:#fff; }
 
-  /* Button with breathing glow at rest */
+  /* Button: background image with glow */
   .btn{
-    position:absolute;left:50%;bottom:15vh;transform:translateX(-50%) scale(1);
-    width:25vw;max-width:200px;min-width:100px;border-radius:999px;cursor:pointer;z-index:20;
-    /* base halo (will be animated) */
-    box-shadow:0 0 18px 10px rgba(var(--glow), .35);
-    animation: glowRest 1.6s ease-in-out infinite;
-    transition: transform var(--press-dur) var(--easing), filter var(--press-dur) var(--easing);
-    will-change: box-shadow, transform, filter;
-  }
-  .btn img{width:100%;height:auto;display:block;border-radius:inherit;pointer-events:none}
+    position: absolute; left: 50%; bottom: 15vh; transform: translateX(-50%) scale(1);
+    width: 25vw; max-width: 200px; min-width: 100px;
+    aspect-ratio: 1 / 1; /* adjust if not square */
+    border-radius: 999px; cursor: pointer; z-index: 20;
 
-  /* Resting: strength-only pulse (no movement) */
+    background: url('button.png') center / contain no-repeat;
+
+    box-shadow: 0 0 18px 10px rgba(var(--glow), .35);
+    animation: glowRest 1.6s ease-in-out infinite;
+    transition: transform var(--press-dur) var(--easing),
+                box-shadow var(--press-dur) var(--easing),
+                filter var(--press-dur) var(--easing);
+    will-change: transform, box-shadow, filter;
+  }
+
+  /* Rest breathing glow */
   @keyframes glowRest{
     0%   { box-shadow: 0 0 14px 8px  rgba(var(--glow), .28); }
     50%  { box-shadow: 0 0 28px 18px rgba(var(--glow), .55); }
     100% { box-shadow: 0 0 14px 8px  rgba(var(--glow), .28); }
   }
 
-  /* Press state: stronger, bigger, quick ramp */
+  /* Press stronger glow */
   .btn.transitioning{
-    transform:translateX(-50%) scale(1.18);
-    filter:saturate(1.08);
+    transform: translateX(-50%) scale(1.18);
+    filter: saturate(1.08);
     animation: glowBoost var(--press-dur) ease-out forwards;
   }
   @keyframes glowBoost{
@@ -67,22 +84,22 @@
 
   /* Responsive */
   @media (max-width:1024px){
-    .btn{width:35vw;max-width:250px;min-width:120px;bottom:12vh}
+    .btn{ width: 35vw; max-width: 250px; min-width: 120px; bottom: 12vh; }
   }
-  @media (prefers-reduced-motion:reduce){
-    .btn{animation:none;transition:none}
-    .screen,.screen.active{transition:none}
+  @media (prefers-reduced-motion: reduce){
+    .btn{ animation: none; transition: none; }
+    .screen, .screen.active{ transition: none; }
   }
 </style>
 </head>
 <body>
 
+<!-- Screen 1 with start button -->
 <div id="screen1" class="screen active">
-  <div class="btn" id="startBtn">
-    <img src="button.png" alt="Start" />
-  </div>
+  <div class="btn" id="startBtn" aria-label="Start" role="button"></div>
 </div>
 
+<!-- Screen 2 -->
 <div id="screen2" class="screen"></div>
 
 <script>
@@ -91,33 +108,36 @@
   const screen2  = document.getElementById('screen2');
   const body     = document.body;
 
-  // timings
+  // Timings
   const debounceMs = 50;   // 0.05s pre-press lock
   const dblDelayMs = 100;  // 0.1s dbl-tap unlock
-  const fadeDurMs  = 800;  // matches --fade-dur
-  const pressDurMs = 350;  // matches --press-dur
+  const fadeDurMs  = 800;  // matches CSS --fade-dur
+  const pressDurMs = 350;  // matches CSS --press-dur
 
   let allowDoubleTap = false;
   let startLocked    = false;
 
+  // Prevent dragging / context menu
+  startBtn.setAttribute('draggable', 'false');
+  startBtn.addEventListener('contextmenu', (e) => e.preventDefault());
+
+  // Start button
   startBtn.addEventListener('click', () => {
     if (startLocked) return;
     startLocked = true;
 
     setTimeout(() => {
-      // ramp glow stronger and scale up
+      // Stronger glow + crossfade
       startBtn.classList.add('transitioning');
       body.classList.add('crossfade');
 
-      // crossfade screens
       screen2.classList.add('active');    // fade in
       screen1.classList.remove('active'); // fade out
 
-      // enable dblclick back shortly after
       allowDoubleTap = false;
       setTimeout(() => { allowDoubleTap = true; }, dblDelayMs);
 
-      // clean up after transition completes
+      // Reset state after transition
       setTimeout(() => {
         body.classList.remove('crossfade');
         startBtn.classList.remove('transitioning');
@@ -126,7 +146,7 @@
     }, debounceMs);
   });
 
-  // Return with double-tap from screen2
+  // Double-tap to go back
   screen2.addEventListener('dblclick', () => {
     if (!allowDoubleTap) return;
     body.classList.add('crossfade');
@@ -135,7 +155,7 @@
     setTimeout(() => { body.classList.remove('crossfade'); }, fadeDurMs + 50);
   });
 
-  // PWA SW
+  // PWA service worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('service-worker.js');
