@@ -97,19 +97,22 @@
   const startBtn = document.getElementById('startBtn');
   const screen1 = document.getElementById('screen1');
   const screen2 = document.getElementById('screen2');
+  let canGoBack = false;
 
   startBtn.addEventListener('click', () => {
-    startBtn.style.pointerEvents = 'none';
+    screen1.classList.remove('active');
+    screen2.classList.add('active');
+    canGoBack = false;
     setTimeout(() => {
-      screen1.classList.remove('active');
-      screen2.classList.add('active');
+      canGoBack = true;
     }, 2000);
   });
 
   screen2.addEventListener('dblclick', () => {
+    if (!canGoBack) return;
     screen2.classList.remove('active');
     screen1.classList.add('active');
-    startBtn.style.pointerEvents = 'auto';
+    canGoBack = false;
   });
 
   if ('serviceWorker' in navigator) {
