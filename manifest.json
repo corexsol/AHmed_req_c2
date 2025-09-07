@@ -4,6 +4,7 @@
   "start_url": "./AhmedReqv2.html",
   "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone"],
   "background_color": "#ffffff",
   "theme_color": "transparent",
   "icons": [
