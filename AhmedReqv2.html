@@ -38,22 +38,19 @@
     background: url('screen_1_NB.jpg') no-repeat center center/cover;
   }
   #screen2 {
-    background: url('screen_two.png') no-repeat center center/contain;
+    background: url('screen_two.png') no-repeat center center/cover;
     background-color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
   }
   .btn {
     position: absolute;
-    bottom: 10vh;
+    bottom: 15vh;
     left: 50%;
     transform: translateX(-50%);
     z-index: 20;
     cursor: pointer;
-    width: 20vw;
-    max-width: 150px;
-    min-width: 80px;
+    width: 25vw;
+    max-width: 200px;
+    min-width: 100px;
     animation: breathing 3s ease-in-out infinite;
   }
   .btn img {
@@ -69,10 +66,10 @@
   /* Responsive adjustments for iPad and tablets */
   @media (max-width: 1024px) {
     .btn {
-      width: 30vw;
-      max-width: 200px;
-      min-width: 100px;
-      bottom: 8vh;
+      width: 35vw;
+      max-width: 250px;
+      min-width: 120px;
+      bottom: 12vh;
     }
   }
 
@@ -90,7 +87,6 @@
 
 <div id="screen2" class="screen">
   <!-- Screen two content -->
-  <img src="screen_two.png" alt="Screen Two" style="max-width: 90%; max-height: 90%; object-fit: contain;">
 </div>
 
 <script>
